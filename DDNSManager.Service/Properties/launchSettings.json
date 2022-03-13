@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "DDNSManager.Service": {
+      "commandName": "Project",
+      "commandLineArgs": "-c config.json",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true
+    }
+  }
+}
