@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace DDNSManager.Lib.Configuration
@@ -15,22 +12,25 @@ namespace DDNSManager.Lib.Configuration
         [JsonIgnore]
         public string? SettingsPath { get; set; }
         [JsonInclude]
-        public Interval Interval { get; set;  }
+        public Interval Interval { get; set; }
         [JsonIgnore]
-        public IList<IServiceSettings> ServiceSettings { get; set;  }
+        public IList<IServiceSettings> ServiceSettings { get; set; }
 
         [JsonIgnore]
         public int EnabledProfiles => ServiceSettings.Where(s => s.Enabled).Count();
 
+        /// <summary>
+        /// Used for the serializer.
+        /// </summary>
         [JsonInclude]
         [JsonPropertyName("ServiceSettings")]
         [JsonConverter(typeof(ServiceSettingsCollectionConverter))]
-        public IEnumerable<IServiceSettings> serializableSettings
+        public IEnumerable<IServiceSettings> SerializableSettings
         {
             get => ServiceSettings ?? Array.Empty<IServiceSettings>();
             private set
             {
-                if(value is ObservableCollection<IServiceSettings> settings)
+                if (value is ObservableCollection<IServiceSettings> settings)
                     ServiceSettings = settings;
                 else
                     ServiceSettings = new ObservableCollection<IServiceSettings>(value);
@@ -51,10 +51,10 @@ namespace DDNSManager.Lib.Configuration
 
         public bool Equals(ManagerSettings? obj)
         {
-            if(obj is ManagerSettings other && Interval.Equals(other.Interval)
+            if (obj is ManagerSettings other && Interval.Equals(other.Interval)
                 && ServiceSettings.Count == other.ServiceSettings.Count)
             {
-                for(int i = 0; i < ServiceSettings.Count; i++)
+                for (int i = 0; i < ServiceSettings.Count; i++)
                 {
                     if (!ServiceSettings[i].Equals(other.ServiceSettings[i]))
                         return false;
@@ -72,15 +72,15 @@ namespace DDNSManager.Lib.Configuration
 
         public int Minutes
         {
-            get { return _minutes; }
+            get => _minutes;
             set
             {
-                if(_minutes == value) return;
+                if (_minutes == value) return;
                 if (value < 0)
                     _minutes = 0;
                 else
                 {
-                    while(value >= 60)
+                    while (value >= 60)
                     {
                         value -= 60;
                         Hours++;
@@ -95,10 +95,10 @@ namespace DDNSManager.Lib.Configuration
 
         public int Hours
         {
-            get { return _hours; }
-            set 
+            get => _hours;
+            set
             {
-                if(_hours == value) return;
+                if (_hours == value) return;
                 if (value < 0)
                     _hours = 0;
                 else
@@ -118,10 +118,10 @@ namespace DDNSManager.Lib.Configuration
 
         public int Days
         {
-            get { return _days; }
-            set 
-            { 
-                if(_days == value) return;
+            get => _days;
+            set
+            {
+                if (_days == value) return;
                 _days = value;
                 NotifyPropertyChanged();
             }

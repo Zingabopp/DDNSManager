@@ -4,7 +4,6 @@ using DDNSManager.Lib.Services;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace DDNSManager.Lib
 {
@@ -41,11 +40,13 @@ namespace DDNSManager.Lib
 
         public static IEnumerable<string> RegisteredServices => serviceSettingsFactories.Keys;
         public static bool TryGetSettingsType(string serviceId, out Type settingsType)
-            => settingsTypeMap.TryGetValue(serviceId, out settingsType);
+        {
+            return settingsTypeMap.TryGetValue(serviceId, out settingsType);
+        }
 
         public static IDDNSService GetService(IServiceProvider serviceProvider, string serviceId, IServiceSettings settings)
         {
-            if (serviceFactories.TryGetValue(serviceId, out var serviceFactory))
+            if (serviceFactories.TryGetValue(serviceId, out Func<IServiceProvider, IServiceSettings, IDDNSService>? serviceFactory))
             {
                 return serviceFactory(serviceProvider, settings);
             }
@@ -55,7 +56,7 @@ namespace DDNSManager.Lib
 
         public static IServiceSettings CreateSettingsForServiceId(string serviceId)
         {
-            if (serviceSettingsFactories.TryGetValue(serviceId, out var settingFactory))
+            if (serviceSettingsFactories.TryGetValue(serviceId, out Func<IServiceSettings>? settingFactory))
             {
                 return settingFactory();
             }

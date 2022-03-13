@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DDNSManager.Lib.Configuration
 {
@@ -21,12 +20,12 @@ namespace DDNSManager.Lib.Configuration
 
             while (reader.Read())
             {
-                var tokenType = reader.TokenType;
+                JsonTokenType tokenType = reader.TokenType;
                 if (tokenType == JsonTokenType.EndArray)
                     break;
                 if (tokenType == JsonTokenType.StartObject)
                 {
-                    var setting = ServiceSettingsConverter.Default.Read(ref reader, typeof(IServiceSettings), options);
+                    IServiceSettings? setting = ServiceSettingsConverter.Default.Read(ref reader, typeof(IServiceSettings), options);
                     if (setting != null)
                         list.Add(setting);
                     else
@@ -39,7 +38,7 @@ namespace DDNSManager.Lib.Configuration
         public override void Write(Utf8JsonWriter writer, IEnumerable<IServiceSettings> value, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
-            foreach (var serviceSettings in value)
+            foreach (IServiceSettings? serviceSettings in value)
             {
                 object obj = (object)serviceSettings;
                 JsonSerializer.Serialize(writer, obj, options);

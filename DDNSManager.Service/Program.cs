@@ -1,7 +1,6 @@
 using CommandLine;
 using DDNSManager.Lib;
 using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.Services;
 using System.Reflection;
 using System.Text.Json;
 namespace DDNSManager.Service
@@ -119,7 +118,7 @@ namespace DDNSManager.Service
         {
             if (settings == null)
                 return;
-            foreach (var serviceId in DefaultServiceRegistration.RegisteredServices)
+            foreach (string? serviceId in DefaultServiceRegistration.RegisteredServices)
             {
                 settings.ServiceSettings.Add(DefaultServiceRegistration.CreateSettingsForServiceId(serviceId));
             }

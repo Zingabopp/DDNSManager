@@ -1,8 +1,4 @@
-﻿using DDNSManager.Lib.ServiceConfiguration;
-using DDNSManager.Lib.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static DDNSManager.Lib.DefaultServiceRegistration;
@@ -21,7 +17,7 @@ namespace DDNSManager.Lib.Configuration
             if (reader.TokenType != JsonTokenType.StartObject)
                 throw new JsonException("Expected start of an object.");
 
-            using var jsonDoc = JsonDocument.ParseValue(ref reader);
+            using JsonDocument? jsonDoc = JsonDocument.ParseValue(ref reader);
             string? serviceId = jsonDoc.RootElement.GetProperty(nameof(IServiceSettings.ServiceId)).GetString();
             if (serviceId != null && TryGetSettingsType(serviceId, out Type type))
             {

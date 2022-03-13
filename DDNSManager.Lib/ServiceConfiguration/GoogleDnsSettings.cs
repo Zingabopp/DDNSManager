@@ -1,9 +1,6 @@
 ﻿using DDNSManager.Lib.Configuration;
 using DDNSManager.Lib.Services;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
 
 namespace DDNSManager.Lib.ServiceConfiguration
 {
@@ -24,10 +21,12 @@ namespace DDNSManager.Lib.ServiceConfiguration
         public string? Username { get; set; }
         public string? Password { get; set; }
 
-        public bool IsValid() => 
-               !string.IsNullOrWhiteSpace(Hostname)
-            && !string.IsNullOrWhiteSpace(Username)
-            && !string.IsNullOrWhiteSpace(Password);
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(Hostname)
+                && !string.IsNullOrWhiteSpace(Username)
+                && !string.IsNullOrWhiteSpace(Password);
+        }
 
         public string ToQuery()
         {

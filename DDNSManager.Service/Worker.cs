@@ -1,6 +1,5 @@
 using DDNSManager.Lib;
 using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.Services;
 using System.Text.Json;
 
 namespace DDNSManager.Service
@@ -69,19 +68,19 @@ namespace DDNSManager.Service
                         serviceSetting.Enabled = false;
                         continue;
                     }
-                    var service = _factory.GetService(serviceSetting.ServiceId, serviceSetting);
+                    IDDNSService? service = _factory.GetService(serviceSetting.ServiceId, serviceSetting);
                     DomainMatchResult matchResult = await service.CheckDomainAsync(stoppingToken).ConfigureAwait(false);
-                    if(matchResult == DomainMatchResult.HostNotFound)
+                    if (matchResult == DomainMatchResult.HostNotFound)
                     {
                         _logger.LogWarning($"A record for '{serviceSetting.Hostname}' was not found, disabling and skipping.");
                         serviceSetting.Enabled = false;
                         continue;
                     }
-                    bool updateRequired = matchResult == DomainMatchResult.Match ? false : true;
+                    bool updateRequired = matchResult != DomainMatchResult.Match;
                     if (updateRequired)
                     {
                         _logger.LogDebug($"Sending update request for {serviceSetting.Name}...");
-                        var result = await service.SendRequestAsync(stoppingToken).ConfigureAwait(false);
+                        IRequestResult? result = await service.SendRequestAsync(stoppingToken).ConfigureAwait(false);
                         if (result.Status == ResultStatus.Completed)
                         {
                             _logger.LogDebug($"Update completed successfully");

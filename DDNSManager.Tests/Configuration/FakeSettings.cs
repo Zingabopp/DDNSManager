@@ -1,9 +1,4 @@
 ﻿using DDNSManager.Lib.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DDNSManager.Tests.Configuration
 {
@@ -26,11 +21,12 @@ namespace DDNSManager.Tests.Configuration
         public string? Password { get; set; }
         public string? FakeSetting1 { get; set; }
         public int FakeSetting2 { get; set; }
-        public bool IsValid() =>
-               !string.IsNullOrWhiteSpace(Hostname)
-            && !string.IsNullOrWhiteSpace(Username)
-            && !string.IsNullOrWhiteSpace(Password);
-
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(Hostname)
+                && !string.IsNullOrWhiteSpace(Username)
+                && !string.IsNullOrWhiteSpace(Password);
+        }
 
         public bool Equals(IServiceSettings? other)
         {

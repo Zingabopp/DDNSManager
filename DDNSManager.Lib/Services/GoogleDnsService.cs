@@ -43,8 +43,10 @@ namespace DDNSManager.Lib.Services
             GoogleDnsSettings settings = ServiceSettings;
             if (!ServiceSettings.IsValid())
                 throw new InvalidOperationException("Settings are not valid.");
-            UriBuilder builder = new UriBuilder(PostUri);
-            builder.Query = ServiceSettings.ToQuery();
+            UriBuilder builder = new UriBuilder(PostUri)
+            {
+                Query = ServiceSettings.ToQuery()
+            };
             Uri uri = builder.Uri;
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
             string authString = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{settings.Username}:{settings.Password}"));

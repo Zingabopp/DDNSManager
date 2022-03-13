@@ -54,7 +54,7 @@ namespace DDNSManager.Lib
             // throw new Exception("An IP was not specified in settings and could not find external IP");
             try
             {
-                string? actualIp = await GetDomainIp(httpClient, hostname!, cancellationToken);
+                string? actualIp = await GetDomainIp(hostname);
                 if (actualIp == null)
                     return DomainMatchResult.NoMatch;
                 if (actualIp.Length == 0)
@@ -84,16 +84,14 @@ namespace DDNSManager.Lib
         /// Attempts to get the IP address currently assigned to the given <paramref name="hostname"/>.
         /// Returns the IP address if found, null if no IP is assigned to the hostname, or an empty string if some other error occurred.
         /// </summary>
-        /// <param name="client"></param>
         /// <param name="hostname"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         /// <exception cref="SocketException"></exception>
-        public static async Task<string?> GetDomainIp(HttpClient client, string hostname, CancellationToken cancellationToken = default)
+        public static async Task<string?> GetDomainIp(string hostname)
         {
             try
             {
-                IPAddress[]? addresses = await Dns.GetHostAddressesAsync(hostname);
+                IPAddress[]? addresses = await Dns.GetHostAddressesAsync(hostname).ConfigureAwait(false);
                 if (addresses != null && addresses.Length > 0)
                     return addresses[0].ToString();
             }

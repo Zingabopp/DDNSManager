@@ -3,18 +3,14 @@ using DDNSManager.Lib.Configuration;
 using DDNSManager.Lib.ServiceConfiguration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace DDNSManager.Tests.Configuration
 {
     [TestClass]
     public class Serializing
     {
-        public static IServiceSettings[] SettingsArray = new IServiceSettings[]
+        private static readonly IServiceSettings[] SettingsArray = new IServiceSettings[]
         {
             new GoogleDnsSettings() { Name = "Google 1", Hostname = "google1.google.com", Enabled = true,
                                         IP = null, Username = "Goog1", Password = "elgoog1" },
@@ -36,15 +32,15 @@ namespace DDNSManager.Tests.Configuration
             int expectedMinutes = 10;
             int expectedHours = 5;
             int expectedDays = 1;
-            var settings = new ManagerSettings(new Interval(expectedMinutes, expectedHours, expectedDays), SettingsArray);
+            ManagerSettings? settings = new ManagerSettings(new Interval(expectedMinutes, expectedHours, expectedDays), SettingsArray);
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
-                 WriteIndented = true
+                WriteIndented = true
             };
             string json = JsonSerializer.Serialize(settings, options);
             Console.WriteLine(json);
 
-            var newSettings = JsonSerializer.Deserialize<ManagerSettings>(json);
+            ManagerSettings? newSettings = JsonSerializer.Deserialize<ManagerSettings>(json);
             Assert.IsNotNull(newSettings);
             Assert.AreEqual(3, newSettings.ServiceSettings.Count);
             Assert.IsTrue(settings.Equals(newSettings));

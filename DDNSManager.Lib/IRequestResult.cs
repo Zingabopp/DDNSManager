@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DDNSManager.Lib
+﻿namespace DDNSManager.Lib
 {
     public interface IRequestResult
     {

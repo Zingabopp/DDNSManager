@@ -3,13 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDNSManager.Service", "DDNSManager.Service\DDNSManager.Service.csproj", "{CBC2F2CE-1FCA-4AD3-8512-59CE4A621D57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDNSManager.Service", "DDNSManager.Service\DDNSManager.Service.csproj", "{CBC2F2CE-1FCA-4AD3-8512-59CE4A621D57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDNSManager.Lib", "DDNSManager.Lib\DDNSManager.Lib.csproj", "{869F9627-7D0E-4045-BB3F-5E16260B8B02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDNSManager.Lib", "DDNSManager.Lib\DDNSManager.Lib.csproj", "{869F9627-7D0E-4045-BB3F-5E16260B8B02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDNSManager.UI", "DDNSManager.UI\DDNSManager.UI.csproj", "{1D5DC06F-517B-4051-B478-83B2B50E3FFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDNSManager.UI", "DDNSManager.UI\DDNSManager.UI.csproj", "{1D5DC06F-517B-4051-B478-83B2B50E3FFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDNSManager.Tests", "DDNSManager.Tests\DDNSManager.Tests.csproj", "{15497EBA-3A2C-462B-9EFC-3AC2D797D5B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDNSManager.Tests", "DDNSManager.Tests\DDNSManager.Tests.csproj", "{15497EBA-3A2C-462B-9EFC-3AC2D797D5B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{016AE465-0503-408D-9A45-578C0BB4D41A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
