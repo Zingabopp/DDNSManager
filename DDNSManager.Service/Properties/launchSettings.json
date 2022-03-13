@@ -2,7 +2,7 @@
   "profiles": {
     "DDNSManager.Service": {
       "commandName": "Project",
-      "commandLineArgs": "-c config.json",
+      "commandLineArgs": "-c bin\\Debug\\net6.0\\config.json",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },

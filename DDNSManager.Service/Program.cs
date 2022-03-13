@@ -95,6 +95,7 @@ namespace DDNSManager.Service
                     ManagerSettings settings = new ManagerSettings() { SettingsPath = settingsPath };
                     try
                     {
+                        PopulateSettings(settings);
                         File.WriteAllText(settingsPath, JsonSerializer.Serialize(settings, Utilities.DefaultJsonOptions));
                         logger.LogWarning($"Settings file at '{settingsPath}' did not exist and was created");
                     }

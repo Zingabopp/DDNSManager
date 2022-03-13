@@ -32,7 +32,7 @@ namespace DDNSManager.Service
                     {
                         using FileStream file = File.OpenRead(settingsPath);
                         ManagerSettings? newSettings = await JsonSerializer
-                            .DeserializeAsync<ManagerSettings>(file, default(JsonSerializerOptions), stoppingToken)
+                            .DeserializeAsync<ManagerSettings>(file, Utilities.DefaultJsonOptions, stoppingToken)
                             .ConfigureAwait(false);
                         if (newSettings != null)
                         {
