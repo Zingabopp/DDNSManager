@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DDNSManager.Lib.Services
+namespace DDNSManager.Lib
 {
     public interface IRequestResult
     {

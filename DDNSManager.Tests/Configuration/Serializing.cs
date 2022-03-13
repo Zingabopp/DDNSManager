@@ -1,4 +1,6 @@
-﻿using DDNSManager.Lib.Configuration;
+﻿using DDNSManager.Lib;
+using DDNSManager.Lib.Configuration;
+using DDNSManager.Lib.ServiceConfiguration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,7 @@ namespace DDNSManager.Tests.Configuration
         [TestInitialize]
         public void Initialize()
         {
-            ServiceSettingsConverter.RegisterType("FakeService", typeof(FakeSettings));
+            DefaultServiceRegistration.RegisterSettingsType("FakeService", typeof(FakeSettings));
         }
 
         [TestMethod]

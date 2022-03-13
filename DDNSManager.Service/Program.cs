@@ -92,7 +92,7 @@ namespace DDNSManager.Service
                 }
                 else if (Directory.Exists(directoryName))
                 {
-                    ManagerSettings settings = new ManagerSettings() { SettingsPath = Path.GetDirectoryName(settingsPath) };
+                    ManagerSettings settings = new ManagerSettings() { SettingsPath = settingsPath };
                     try
                     {
                         File.WriteAllText(settingsPath, JsonSerializer.Serialize(settings, Utilities.DefaultJsonOptions));
@@ -111,6 +111,16 @@ namespace DDNSManager.Service
             {
                 logger.LogError(new EventId(2002, "SettingsException"), $"Error reading settings from '{settingsPath}': {ex.Message}");
                 throw;
+            }
+        }
+
+        private static void PopulateSettings(ManagerSettings settings)
+        {
+            if (settings == null)
+                return;
+            foreach (var serviceId in DefaultServiceRegistration.RegisteredServices)
+            {
+                settings.ServiceSettings.Add(DefaultServiceRegistration.CreateSettingsForServiceId(serviceId));
             }
         }
     }

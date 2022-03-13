@@ -1,10 +1,11 @@
-﻿using DDNSManager.Lib.Services;
+﻿using DDNSManager.Lib.Configuration;
+using DDNSManager.Lib.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace DDNSManager.Lib.Configuration
+namespace DDNSManager.Lib.ServiceConfiguration
 {
     public class GoogleDnsSettings : IServiceSettings
     {

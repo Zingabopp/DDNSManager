@@ -1,4 +1,6 @@
 ﻿using DDNSManager.Lib.Configuration;
+using DDNSManager.Lib.ServiceConfiguration;
+using DDNSManager.Lib.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,24 +8,28 @@ using System.Net.Http;
 using System.Runtime;
 using System.Text;
 
-namespace DDNSManager.Lib.Services
+namespace DDNSManager.Lib
 {
     public class DDNSServiceFactory
     {
         private IServiceProvider _serviceProvider;
         private readonly Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>> serviceFactories 
-            = new Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>>()
-            {
-                { GoogleDnsService.ServiceId, (p, s) => new GoogleDnsService((HttpClient)p.GetService(typeof(HttpClient)), s) }
-            };
-        private readonly Dictionary<string, Func<IServiceSettings>> serviceSettingsFactories
-            = new Dictionary<string, Func<IServiceSettings>>()
-            {
-                { GoogleDnsService.ServiceId, () => new GoogleDnsSettings() }
-            };
+            = new Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>>();
+
+        private readonly Dictionary<string, Func<IServiceSettings>> serviceSettingsFactories;
         public DDNSServiceFactory(IServiceProvider provider)
         {
             _serviceProvider = provider;
+            serviceFactories 
+                = new Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>>(DefaultServiceRegistration.serviceFactories);
+            serviceSettingsFactories 
+                = new Dictionary<string, Func<IServiceSettings>>(DefaultServiceRegistration.serviceSettingsFactories);
+        }
+
+        public void ClearProviders()
+        {
+            serviceFactories.Clear();
+            serviceSettingsFactories.Clear();
         }
 
         public IEnumerable<string> GetRegisteredServiceIds => serviceFactories.Keys;

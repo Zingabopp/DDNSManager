@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DDNSManager.Lib.Services
+namespace DDNSManager.Lib
 {
     public interface IDDNSService
     {
@@ -16,9 +16,9 @@ namespace DDNSManager.Lib.Services
         Task<IRequestResult> SendRequestAsync(CancellationToken cancellationToken = default);
     }
 
-    public interface IDDNSService<TSettings>
+    public interface IDDNSService<TSettings> : IDDNSService
         where TSettings : class, new()
     {
-        TSettings Settings { get; set; }
+        TSettings ServiceSettings { get; set; }
     }
 }
