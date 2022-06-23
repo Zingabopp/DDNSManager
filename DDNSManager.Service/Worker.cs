@@ -1,5 +1,6 @@
 using DDNSManager.Lib;
 using DDNSManager.Lib.Configuration;
+using System.Reflection;
 using System.Text.Json;
 
 namespace DDNSManager.Service
@@ -10,12 +11,15 @@ namespace DDNSManager.Service
         private readonly DDNSServiceFactory _factory;
         private readonly HttpClient _httpClient;
         private ManagerSettings _settings;
+        private readonly string Name;
         public Worker(ILogger<Worker> logger, DDNSServiceFactory _serviceFactory, HttpClient httpClient, ManagerSettings settings)
         {
             _logger = logger;
             _factory = _serviceFactory;
             _httpClient = httpClient;
             _settings = settings;
+            Version? version = GetType().Assembly.GetName().Version;
+            Name = $"DDNS Manager v{version?.Major}.{version?.Minor}.{version?.Build}";
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,10 +57,10 @@ namespace DDNSManager.Service
 
                 string? currentIp = await Utilities.GetExternalIp(_httpClient, stoppingToken).ConfigureAwait(false);
                 if (currentIp != null)
-                    _logger.LogInformation(new EventId(1, "Started"), $"DDNS Manager running, current IP: {currentIp}, enabled profiles: {_settings.EnabledProfiles}");
+                    _logger.LogInformation(new EventId(1, "Started"), $"{Name} running, current IP: {currentIp}, enabled profiles: {_settings.EnabledProfiles}");
                 else
                 {
-                    _logger.LogInformation(new EventId(1, "Started"), $"DDNS Manager running, unable to get current IP, enabled profiles: {_settings.EnabledProfiles}.");
+                    _logger.LogInformation(new EventId(1, "Started"), $"{Name} running, unable to get current IP, enabled profiles: {_settings.EnabledProfiles}.");
                 }
 
                 foreach (IServiceSettings? serviceSetting in _settings.ServiceSettings.Where(s => s.Enabled))
