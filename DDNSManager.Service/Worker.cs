@@ -72,8 +72,8 @@ namespace DDNSManager.Service
                     DomainMatchResult matchResult = await service.CheckDomainAsync(stoppingToken).ConfigureAwait(false);
                     if (matchResult == DomainMatchResult.HostNotFound)
                     {
-                        _logger.LogWarning($"A record for '{serviceSetting.Hostname}' was not found, disabling and skipping.");
-                        serviceSetting.Enabled = false;
+                        _logger.LogWarning($"A record for '{serviceSetting.Hostname}' was not found, skipping.");
+                        //serviceSetting.Enabled = false;
                         continue;
                     }
                     bool updateRequired = matchResult != DomainMatchResult.Match;
