@@ -163,7 +163,7 @@ namespace DDNSManager.Lib.Services
                 if (!string.IsNullOrWhiteSpace(ip))
                 {
                     externalIp = ip;
-                    _memoryCache?.Set(ExternalIpCacheId, ip);
+                    _memoryCache?.Set(ExternalIpCacheId, ip, TimeSpan.FromMinutes(5));
                 }
             }
             return externalIp;
