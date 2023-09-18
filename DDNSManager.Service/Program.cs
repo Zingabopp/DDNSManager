@@ -37,6 +37,7 @@ namespace DDNSManager.Service
                     services.AddSingleton<HttpClient>(GetHttpClient);
                     services.AddSingleton<DDNSServiceFactory>();
                     services.AddHostedService<Worker>();
+                    services.AddMemoryCache();
                 })
                 .Build();
             try

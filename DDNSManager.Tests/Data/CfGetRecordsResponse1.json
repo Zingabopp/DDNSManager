@@ -1,0 +1,59 @@
+{
+  "result": [
+    {
+      "id": "gfmfkrojfhrx8hgs64dq6v",
+      "zone_id": "6gn6qj6ujtco93utza4y3i",
+      "zone_name": "testing.com",
+      "name": "www.testing.com",
+      "type": "A",
+      "content": "111.222.333.444",
+      "proxiable": true,
+      "proxied": false,
+      "ttl": 1,
+      "locked": false,
+      "meta": {
+        "auto_added": false,
+        "managed_by_apps": false,
+        "managed_by_argo_tunnel": false,
+        "source": "primary"
+      },
+      "comment": null,
+      "tags": [],
+      "created_on": "2023-09-18T03:16:04.09865Z",
+      "modified_on": "2023-09-18T04:53:06.53671Z"
+    },
+    {
+      "id": "tz8j99rard8vznff7eig5e",
+      "zone_id": "6gn6qj6ujtco93utza4y3i",
+      "zone_name": "testing.com",
+      "name": "testing.com",
+      "type": "A",
+      "content": "111.222.333.444",
+      "proxiable": true,
+      "proxied": false,
+      "ttl": 1,
+      "locked": false,
+      "meta": {
+        "auto_added": false,
+        "managed_by_apps": false,
+        "managed_by_argo_tunnel": false,
+        "source": "primary"
+      },
+      "comment": null,
+      "tags": [],
+      "created_on": "2023-09-18T02:12:37.961236Z",
+      "modified_on": "2023-09-18T03:30:58.501577Z"
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result_info": {
+    "page": 1,
+    "per_page": 100,
+    "count": 2,
+    "total_count": 2,
+    "total_pages": 1
+  }
+}
+    

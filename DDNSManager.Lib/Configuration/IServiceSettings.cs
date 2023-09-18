@@ -26,6 +26,10 @@ namespace DDNSManager.Lib.Configuration
         /// </summary>
         bool Enabled { get; set; }
         /// <summary>
+        /// If true, allow the record to be created if it doesn't exist.
+        /// </summary>
+        bool AllowCreate { get; }
+        /// <summary>
         /// Returns true if this <see cref="IServiceSettings"/> has a valid set of settings.
         /// </summary>
         bool IsValid();

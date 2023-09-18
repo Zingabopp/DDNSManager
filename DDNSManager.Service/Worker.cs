@@ -74,35 +74,37 @@ namespace DDNSManager.Service
                     }
                     IDDNSService? service = _factory.GetService(serviceSetting.ServiceId, serviceSetting);
                     DomainMatchResult matchResult = await service.CheckDomainAsync(stoppingToken).ConfigureAwait(false);
-                    if (matchResult == DomainMatchResult.HostNotFound)
+                    if (matchResult == DomainMatchResult.HostNotFound && !serviceSetting.AllowCreate)
                     {
-                        _logger.LogWarning($"A record for '{serviceSetting.Hostname}' was not found, skipping.");
+                        _logger.LogWarning("A record for '{Hostname}' was not found, skipping.", serviceSetting.Hostname);
                         //serviceSetting.Enabled = false;
                         continue;
                     }
                     bool updateRequired = matchResult != DomainMatchResult.Match;
                     if (updateRequired)
                     {
-                        _logger.LogDebug($"Sending update request for {serviceSetting.Name}...");
+                        bool isCreate = matchResult == DomainMatchResult.HostNotFound;
+                        string requestType = isCreate ? "Create" : "Update";
+                        _logger.LogDebug("Sending {RequestType} request for {Name}...", requestType, serviceSetting.Name);
                         IRequestResult? result = await service.SendRequestAsync(stoppingToken).ConfigureAwait(false);
                         if (result.Status == ResultStatus.Completed)
                         {
-                            _logger.LogDebug($"Update completed successfully");
+                            _logger.LogDebug("{RequestType} completed successfully", requestType);
                         }
                         else
                         {
-                            _logger.LogWarning($"Failed to update DNS record {serviceSetting.Hostname}: {result.Message}");
+                            _logger.LogWarning("Failed to {RequestType} DNS record {Hostname}: {Message}", requestType, serviceSetting.Hostname, result.Message);
                         }
                         await Task.Delay(2000, stoppingToken).ConfigureAwait(false);
                     }
                     else
-                        _logger.LogDebug($"Update not required for '{serviceSetting.Name}'");
+                        _logger.LogDebug("Update not required for '{Name}'", serviceSetting.Name);
                 }
                 if (settingsPath != null)
                     File.WriteAllText(settingsPath, JsonSerializer.Serialize(_settings, Utilities.DefaultJsonOptions));
 
                 TimeSpan interval = _settings.Interval.ToTimeSpan();
-                _logger.LogDebug($"Sleeping for {interval}");
+                _logger.LogDebug("Sleeping for {Interval}", interval);
                 await Task.Delay(interval, stoppingToken);
             }
         }

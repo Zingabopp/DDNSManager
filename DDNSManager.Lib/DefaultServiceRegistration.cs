@@ -1,6 +1,7 @@
 ﻿using DDNSManager.Lib.Configuration;
 using DDNSManager.Lib.ServiceConfiguration;
 using DDNSManager.Lib.Services;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,7 +17,8 @@ namespace DDNSManager.Lib
         /// </summary>
         internal static readonly Dictionary<string, Type> settingsTypeMap = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
             {
-                { GoogleDnsService.ServiceId, typeof(GoogleDnsSettings) }
+                { GoogleDnsService.ServiceId, typeof(GoogleDnsSettings) },
+                { CloudflareDnsService.ServiceId, typeof(CloudflareDnsSettings) }
             };
 
         /// <summary>
@@ -25,7 +27,8 @@ namespace DDNSManager.Lib
         internal static readonly Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>> serviceFactories
             = new Dictionary<string, Func<IServiceProvider, IServiceSettings, IDDNSService>>()
             {
-                { GoogleDnsService.ServiceId, (p, s) => new GoogleDnsService((HttpClient)p.GetService(typeof(HttpClient)), (GoogleDnsSettings)s) }
+                { GoogleDnsService.ServiceId, (p, s) => new GoogleDnsService((HttpClient)p.GetService(typeof(HttpClient))!, (GoogleDnsSettings)s) },
+                { CloudflareDnsService.ServiceId, (p, s) => new CloudflareDnsService((HttpClient)p.GetService(typeof(HttpClient))!, (CloudflareDnsSettings)s, (IMemoryCache)p.GetService(typeof(IMemoryCache))!) }
             };
 
         /// <summary>
@@ -34,7 +37,9 @@ namespace DDNSManager.Lib
         internal static readonly Dictionary<string, Func<IServiceSettings>> serviceSettingsFactories
             = new Dictionary<string, Func<IServiceSettings>>()
             {
-                { GoogleDnsService.ServiceId, () => new GoogleDnsSettings() }
+                { GoogleDnsService.ServiceId, () => new GoogleDnsSettings() },
+                { CloudflareDnsService.ServiceId, () => new CloudflareDnsSettings() }
+
             };
         #endregion
 

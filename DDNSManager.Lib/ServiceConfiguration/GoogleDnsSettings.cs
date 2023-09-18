@@ -1,6 +1,7 @@
 ﻿using DDNSManager.Lib.Configuration;
 using DDNSManager.Lib.Services;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace DDNSManager.Lib.ServiceConfiguration
 {
@@ -20,6 +21,8 @@ namespace DDNSManager.Lib.ServiceConfiguration
 
         public string? Username { get; set; }
         public string? Password { get; set; }
+        [JsonIgnore]
+        bool IServiceSettings.AllowCreate => false;
 
         public bool IsValid()
         {

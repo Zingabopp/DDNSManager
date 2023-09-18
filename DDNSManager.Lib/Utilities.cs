@@ -75,7 +75,7 @@ namespace DDNSManager.Lib
             using HttpResponseMessage? response = await client.GetAsync("https://domains.google.com/checkip", cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                string ip = await response.Content.ReadAsStringAsync();
+                string ip = await response.Content.ReadAsStringAsync(cancellationToken);
                 return ip;
             }
             return null;

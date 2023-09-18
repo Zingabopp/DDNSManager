@@ -1,0 +1,11 @@
+﻿{
+    "result": null,
+    "success": false,
+    "errors": [
+        {
+            "code": 9002,
+            "message": "DNS record type is invalid."
+        }
+    ],
+    "messages": []
+}
