@@ -51,11 +51,12 @@ namespace DDNSManager.Lib.Services
             _memoryCache = memoryCache;
         }
 
-        public Task<DomainMatchResult> CheckDomainAsync(CancellationToken cancellationToken = default)
+        public async Task<DomainMatchResult> CheckDomainAsync(CancellationToken cancellationToken = default)
         {
-            string? expectedIp = ServiceSettings.IP;
+            string? expectedIp = await GetDomainIpAsync(cancellationToken);
             string hostname = ServiceSettings.Hostname ?? throw new InvalidOperationException("No hostname specified in settings.");
-            return Utilities.CheckDomainAsync(_httpClient, expectedIp, hostname, cancellationToken);
+            var domainResult = await Utilities.CheckDomainAsync(_httpClient, expectedIp, hostname, cancellationToken);
+            return domainResult;
         }
 
         public async Task<IRequestResult> SendRequestAsync(CancellationToken cancellationToken = default)
@@ -66,31 +67,22 @@ namespace DDNSManager.Lib.Services
             string hostname = settings.Hostname!;
             List<CloudflareRecord> currentRecords = await GetRecordsAsync();
             CloudflareRecord? existingRecord = currentRecords.FirstOrDefault(r => hostname.Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            string? domainIp = await GetDomainIpAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(domainIp))
+            {
+                return new CloudflareDnsResponse("Failed: Unable to determine domain IP")
+                {
+                    Status = ResultStatus.Faulted,
+                    Message = "Unable to determine domain IP"
+                };
+            }
             CloudflareCreateRequest cfRequest = new CloudflareCreateRequest()
             {
                 Hostname = ServiceSettings.Hostname!,
-                IP = ServiceSettings.IP!,
+                IP = domainIp,
                 RecordType = "A",
                 Proxied = ServiceSettings.Proxied
             };
-            if(cfRequest.IP == null)
-            {
-                if(_memoryCache != null 
-                    && _memoryCache.TryGetValue(ExternalIpCacheId, out string? cachedExternalIp)
-                    && !string.IsNullOrWhiteSpace(cachedExternalIp))
-                {
-                    cfRequest.IP = cachedExternalIp;
-                }
-                else
-                {
-                    var ip = await Utilities.GetExternalIp(_httpClient, cancellationToken);
-                    if (!string.IsNullOrWhiteSpace(ip))
-                    {
-                        cfRequest.IP = ip;
-                        _memoryCache?.Set(ExternalIpCacheId, ip);
-                    }
-                }
-            }
             Uri uri;
             HttpRequestMessage request;
             if (existingRecord != null)
@@ -145,6 +137,36 @@ namespace DDNSManager.Lib.Services
                 _memoryCache.Set(GetRecordsCacheId, records, TimeSpan.FromMinutes(5));
             }
             return records;
+        }
+
+        private async ValueTask<string?> GetDomainIpAsync(CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(ServiceSettings.IP))
+            {
+                return await GetExternalIpAsync(cancellationToken);
+            }
+            return ServiceSettings.IP;
+        }
+
+        private async Task<string?> GetExternalIpAsync(CancellationToken cancellationToken = default)
+        {
+            string? externalIp = null;
+            if (_memoryCache != null
+                    && _memoryCache.TryGetValue(ExternalIpCacheId, out string? cachedExternalIp)
+                    && !string.IsNullOrWhiteSpace(cachedExternalIp))
+            {
+                externalIp = cachedExternalIp;
+            }
+            else
+            {
+                var ip = await Utilities.GetExternalIp(_httpClient, cancellationToken);
+                if (!string.IsNullOrWhiteSpace(ip))
+                {
+                    externalIp = ip;
+                    _memoryCache?.Set(ExternalIpCacheId, ip);
+                }
+            }
+            return externalIp;
         }
 
         private HttpRequestMessage CreateRequestMessage(HttpMethod method, Uri uri)
