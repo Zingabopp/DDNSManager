@@ -89,7 +89,7 @@ namespace DDNSManager.Service
                         IRequestResult? result = await service.SendRequestAsync(stoppingToken).ConfigureAwait(false);
                         if (result.Status == ResultStatus.Completed)
                         {
-                            _logger.LogDebug("{RequestType} completed successfully", requestType);
+                            _logger.LogInformation("{RequestType} completed successfully for {Name}", requestType, serviceSetting.Name);
                         }
                         else
                         {
