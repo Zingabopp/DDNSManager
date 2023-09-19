@@ -23,13 +23,13 @@ namespace DDNSManager.Lib.Services
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        private const string GetRecordsCacheId = "Cf_GetRecords";
+        //private const string GetRecordsCacheId = "Cf_GetRecords";
         private const string ExternalIpCacheId = "ExternalIpCacheId";
         private const string BaseUrl = "https://api.cloudflare.com/client/v4/";
         public const string ServiceId = "CloudflareDns";
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache? _memoryCache;
-
+        private string GetRecordsCacheId() => $"Cf_GetRecords_{ServiceSettings.ZoneId}";
         public CloudflareDnsSettings ServiceSettings { get; set; }
 
         string IDDNSService.ServiceId => ServiceId;
@@ -55,8 +55,17 @@ namespace DDNSManager.Lib.Services
         {
             string? expectedIp = await GetDomainIpAsync(cancellationToken);
             string hostname = ServiceSettings.Hostname ?? throw new InvalidOperationException("No hostname specified in settings.");
-            var domainResult = await Utilities.CheckDomainAsync(_httpClient, expectedIp, hostname, cancellationToken);
-            return domainResult;
+            List<CloudflareRecord> currentRecords = await GetRecordsAsync(cancellationToken);
+            CloudflareRecord? existing = currentRecords.FirstOrDefault(r => hostname.Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                return existing.IP == expectedIp && existing.Proxied == ServiceSettings.Proxied 
+                                                        ? DomainMatchResult.Match : DomainMatchResult.NoMatch;
+            }
+            else
+            {
+                return DomainMatchResult.HostNotFound;
+            }
         }
 
         public async Task<IRequestResult> SendRequestAsync(CancellationToken cancellationToken = default)
@@ -118,7 +127,7 @@ namespace DDNSManager.Lib.Services
         public async Task<List<CloudflareRecord>> GetRecordsAsync(CancellationToken cancellationToken = default)
         {
             if (_memoryCache != null
-                && _memoryCache.TryGetValue(GetRecordsCacheId, out object? value)
+                && _memoryCache.TryGetValue(GetRecordsCacheId(), out object? value)
                 && value is List<CloudflareRecord> records)
             {
                 return records;
@@ -134,7 +143,7 @@ namespace DDNSManager.Lib.Services
             records = response.Result;
             if (_memoryCache != null)
             {
-                _memoryCache.Set(GetRecordsCacheId, records, TimeSpan.FromMinutes(5));
+                _memoryCache.Set(GetRecordsCacheId(), records, TimeSpan.FromMinutes(5));
             }
             return records;
         }
@@ -159,7 +168,7 @@ namespace DDNSManager.Lib.Services
             }
             else
             {
-                var ip = await Utilities.GetExternalIp(_httpClient, cancellationToken);
+                string? ip = await Utilities.GetExternalIp(_httpClient, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(ip))
                 {
                     externalIp = ip;
