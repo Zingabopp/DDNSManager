@@ -1,5 +1,6 @@
 using DDNSManager.Lib;
 using DDNSManager.Lib.Configuration;
+using DDNSManager.Lib.Services;
 using System.Reflection;
 using System.Text.Json;
 
@@ -11,13 +12,16 @@ namespace DDNSManager.Service
         private readonly DDNSServiceFactory _factory;
         private readonly HttpClient _httpClient;
         private ManagerSettings _settings;
+        private readonly IIPCheckService _iPCheckService;
         private readonly string Name;
-        public Worker(ILogger<Worker> logger, DDNSServiceFactory _serviceFactory, HttpClient httpClient, ManagerSettings settings)
+        public Worker(ILogger<Worker> logger, DDNSServiceFactory _serviceFactory, HttpClient httpClient, 
+            ManagerSettings settings, IIPCheckService iPCheckService)
         {
             _logger = logger;
             _factory = _serviceFactory;
             _httpClient = httpClient;
             _settings = settings;
+            _iPCheckService = iPCheckService;
             Version? version = GetType().Assembly.GetName().Version;
             Name = $"DDNS Manager v{version?.Major}.{version?.Minor}.{version?.Build}";
         }
@@ -55,12 +59,16 @@ namespace DDNSManager.Service
                     }
                 }
 
-                string? currentIp = await Utilities.GetExternalIp(_httpClient, stoppingToken).ConfigureAwait(false);
-                if (currentIp != null)
-                    _logger.LogInformation(new EventId(1, "Started"), $"{Name} running, current IP: {currentIp}, enabled profiles: {_settings.EnabledProfiles}");
-                else
+                string? currentIp = null;
+                var ipResponse = await _iPCheckService.GetCurrentIPAsync(stoppingToken).ConfigureAwait(false);
+                if(ipResponse.IsError)
                 {
                     _logger.LogInformation(new EventId(1, "Started"), $"{Name} running, unable to get current IP, enabled profiles: {_settings.EnabledProfiles}.");
+                }
+                else
+                {
+                    currentIp = ipResponse.Value;
+                    _logger.LogInformation(new EventId(1, "Started"), $"{Name} running, current IP: {currentIp}, enabled profiles: {_settings.EnabledProfiles}");                    
                 }
 
                 foreach (IServiceSettings? serviceSetting in _settings.ServiceSettings.Where(s => s.Enabled))

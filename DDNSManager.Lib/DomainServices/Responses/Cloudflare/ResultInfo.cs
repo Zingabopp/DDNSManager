@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DDNSManager.Lib.Services.Responses.Cloudflare
+namespace DDNSManager.Lib.DomainServices.Responses.Cloudflare
 {
     public class ResultInfo
     {

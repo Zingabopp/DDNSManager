@@ -1,8 +1,8 @@
 ﻿using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.Services;
+using DDNSManager.Lib.DomainServices;
 using System;
 
-namespace DDNSManager.Lib.ServiceConfiguration
+namespace DDNSManager.Lib.DomainServiceConfiguration
 {
     public class CloudflareDnsSettings : IServiceSettings
     {
@@ -13,20 +13,33 @@ namespace DDNSManager.Lib.ServiceConfiguration
             get => _name ?? Hostname;
             set => _name = value;
         }
-
-        public bool Enabled { get; set; }
         public string? Hostname { get; set; }
         public string? IP { get; set; }
-        public bool Proxied { get; set; }
+        public bool Enabled { get; set; }
         public bool AllowCreate { get; set; }
 
+        public bool Proxied { get; set; }
         public string ZoneId { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string ApiKey { get; set; } = null!;
 
-        public bool Equals(IServiceSettings other)
+        public bool Equals(IServiceSettings? other)
         {
-            throw new NotImplementedException();
+            if (other == null) return false;
+
+            if(other is not CloudflareDnsSettings cfSettings)
+                return false;
+
+            return ServiceId == cfSettings.ServiceId
+                && Name == cfSettings.Name
+                && Hostname == cfSettings.Hostname
+                && IP == cfSettings.IP
+                && Enabled == cfSettings.Enabled
+                && AllowCreate == cfSettings.AllowCreate
+                && Proxied == cfSettings.Proxied
+                && ZoneId == cfSettings.ZoneId
+                && Email == cfSettings.Email
+                && ApiKey == cfSettings.ApiKey;
         }
 
         public bool IsValid()

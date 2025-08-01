@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DDNSManager.Lib
+namespace DDNSManager.Lib.Services
 {
     public interface IDDNSService
     {

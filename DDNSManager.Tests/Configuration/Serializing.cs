@@ -1,6 +1,6 @@
 ﻿using DDNSManager.Lib;
 using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.ServiceConfiguration;
+using DDNSManager.Lib.DomainServiceConfiguration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text.Json;

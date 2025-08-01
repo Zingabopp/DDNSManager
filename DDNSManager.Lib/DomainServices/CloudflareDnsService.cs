@@ -1,6 +1,7 @@
 ﻿using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.ServiceConfiguration;
-using DDNSManager.Lib.Services.Responses.Cloudflare;
+using DDNSManager.Lib.DomainServiceConfiguration;
+using DDNSManager.Lib.DomainServices.Responses.Cloudflare;
+using DDNSManager.Lib.Services;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DDNSManager.Lib.Services
+namespace DDNSManager.Lib.DomainServices
 {
     public class CloudflareDnsService : IDDNSService<CloudflareDnsSettings>
     {
@@ -29,6 +30,10 @@ namespace DDNSManager.Lib.Services
         public const string ServiceId = "CloudflareDns";
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache? _memoryCache;
+        private readonly IDomainCheckService _domainCheckService;
+        private readonly IIPCheckService _iPCheckService;
+        private readonly ILogger<CloudflareDnsService> _logger;
+
         private string GetRecordsCacheId() => $"Cf_GetRecords_{ServiceSettings.ZoneId}";
         public CloudflareDnsSettings ServiceSettings { get; set; }
 
@@ -37,18 +42,17 @@ namespace DDNSManager.Lib.Services
 
         public string ServiceName => "Cloudflare DNS";
 
-
-        public CloudflareDnsService(HttpClient httpClient)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            ServiceSettings = new CloudflareDnsSettings();
-        }
-        public CloudflareDnsService(HttpClient httpClient, CloudflareDnsSettings settings, IMemoryCache memoryCache)
+        public CloudflareDnsService(HttpClient httpClient, CloudflareDnsSettings settings, IMemoryCache memoryCache,
+            IDomainCheckService domainCheckService, IIPCheckService iPCheckService,
+            ILogger<CloudflareDnsService> logger)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             settings ??= new CloudflareDnsSettings();
             ServiceSettings = settings;
             _memoryCache = memoryCache;
+            _domainCheckService = domainCheckService;
+            _iPCheckService = iPCheckService;
+            _logger = logger;
         }
 
         public async Task<DomainMatchResult> CheckDomainAsync(CancellationToken cancellationToken = default)
@@ -168,7 +172,13 @@ namespace DDNSManager.Lib.Services
             }
             else
             {
-                string? ip = await Utilities.GetExternalIp(_httpClient, cancellationToken);
+                var ipResult = await _iPCheckService.GetCurrentIPAsync(cancellationToken).ConfigureAwait(false);
+                if (ipResult.IsError)
+                {
+                    _logger.LogError("No expected IP was specified and failed to retrieve current IP address.");
+                    return null;
+                }
+                string ip = ipResult.Value;
                 if (!string.IsNullOrWhiteSpace(ip))
                 {
                     externalIp = ip;

@@ -1,6 +1,7 @@
-﻿using DDNSManager.Lib.ServiceConfiguration;
+﻿using DDNSManager.Lib.DomainServiceConfiguration;
+using DDNSManager.Lib.DomainServices;
+using DDNSManager.Lib.DomainServices.Responses.Cloudflare;
 using DDNSManager.Lib.Services;
-using DDNSManager.Lib.Services.Responses.Cloudflare;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace DDNSManager.Tests.Services
+namespace DDNSManager.Tests.DomainServices
 {
     [TestClass]
     public class CloudflareDnsServiceTests
@@ -27,7 +28,9 @@ namespace DDNSManager.Tests.Services
         public async Task GetRecords()
         {
             var settings = GetDnsSettings();
-            var service = new CloudflareDnsService(HttpClient, settings, null!);
+            var service = new CloudflareDnsService(HttpClient, settings, null!, 
+                new DefaultDomainCheckService(new ConsoleLogger<DefaultDomainCheckService>()), new IpifyIpCheckService(HttpClient, new ConsoleLogger<IpifyIpCheckService>()),
+                new ConsoleLogger<CloudflareDnsService>());
             try
             {
                 var records = await service.GetRecordsAsync();
@@ -41,7 +44,7 @@ namespace DDNSManager.Tests.Services
         [TestMethod]
         public async Task GetRecordsDeserialization()
         {
-            string raw = File.ReadAllText("Data/CfGetRecordsResponse1.json");
+            string raw = await File.ReadAllTextAsync("Data/CfGetRecordsResponse1.json");
             var data = JsonSerializer.Deserialize<CloudflareGetRecordsResponse>(raw, CloudflareDnsService.JsonSerializerOptions);
 
         }

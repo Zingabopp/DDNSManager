@@ -1,41 +1,56 @@
 ﻿using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.ServiceConfiguration;
+using DDNSManager.Lib.DomainServiceConfiguration;
+using DDNSManager.Lib.Services;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DDNSManager.Lib.Services
+namespace DDNSManager.Lib.DomainServices
 {
     public sealed class GoogleDnsService : IDDNSService<GoogleDnsSettings>
     {
         public const string ServiceId = "GoogleDns";
         private static readonly Uri PostUri = new Uri("https://domains.google.com/nic/update");
         private readonly HttpClient _httpClient;
+        private readonly IDomainCheckService _domainCheckService;
+        private readonly IIPCheckService _iPCheckService;
+        private readonly ILogger<GoogleDnsService> _logger;
+
         string IDDNSService.ServiceId => ServiceId;
         IServiceSettings IDDNSService.Settings => ServiceSettings;
         public GoogleDnsSettings ServiceSettings { get; set; }
         public string ServiceName => "Google DDNS";
 
-        public GoogleDnsService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-            ServiceSettings = new GoogleDnsSettings();
-        }
-        public GoogleDnsService(HttpClient httpClient, GoogleDnsSettings settings)
+        public GoogleDnsService(HttpClient httpClient, GoogleDnsSettings settings, 
+            IDomainCheckService domainCheckService, IIPCheckService iPCheckService,
+            ILogger<GoogleDnsService> logger)
         {
             _httpClient = httpClient;
             if (settings == null)
                 settings = new GoogleDnsSettings();
             ServiceSettings = settings;
+            _domainCheckService = domainCheckService;
+            _iPCheckService = iPCheckService;
+            _logger = logger;
         }
 
-        public Task<DomainMatchResult> CheckDomainAsync(CancellationToken cancellationToken = default)
+        public async Task<DomainMatchResult> CheckDomainAsync(CancellationToken cancellationToken = default)
         {
             string? expectedIp = ServiceSettings.IP;
+            if(string.IsNullOrWhiteSpace(expectedIp))
+            {
+                var ipResult = await _iPCheckService.GetCurrentIPAsync(cancellationToken).ConfigureAwait(false);
+                if(ipResult.IsError)
+                {
+                    _logger.LogError("No expected IP was specified and failed to retrieve current IP address.");
+                    return DomainMatchResult.Inconclusive;
+                }
+                expectedIp = ipResult.Value;
+            }
             string hostname = ServiceSettings.Hostname ?? throw new InvalidOperationException("No hostname specified in settings.");
-            return Utilities.CheckDomainAsync(_httpClient, expectedIp, hostname, cancellationToken);
+            return await _domainCheckService.CheckDomainAsync(expectedIp, hostname, cancellationToken);
         }
 
         public async Task<IRequestResult> SendRequestAsync(CancellationToken cancellationToken = default)

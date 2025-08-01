@@ -48,9 +48,10 @@ namespace DDNSManager.Service
             if (!string.IsNullOrWhiteSpace(FilePath))
                 DirectoryPath = Path.GetDirectoryName(FilePath);
         }
-        public IDisposable BeginScope<TState>(TState state)
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
         {
-            return null!;
+            return null;
         }
 
         [MemberNotNullWhen(true, nameof(FilePath))]

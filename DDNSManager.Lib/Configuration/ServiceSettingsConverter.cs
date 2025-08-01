@@ -19,7 +19,7 @@ namespace DDNSManager.Lib.Configuration
 
             using JsonDocument? jsonDoc = JsonDocument.ParseValue(ref reader);
             string? serviceId = jsonDoc.RootElement.GetProperty(nameof(IServiceSettings.ServiceId)).GetString();
-            if (serviceId != null && TryGetSettingsType(serviceId, out Type type))
+            if (serviceId != null && TryGetSettingsType(serviceId, out Type? type))
             {
                 return jsonDoc.Deserialize(type, options) as IServiceSettings;
             }

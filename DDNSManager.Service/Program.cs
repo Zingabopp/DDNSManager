@@ -14,30 +14,34 @@ namespace DDNSManager.Service
                 {
                     options.ServiceName = "DDNS Manager";
                 })
+                .ConfigureServices(services =>
+                {
+                    services.AddLogging();
+                    services.AddSingleton<CommandLineOptions>(p => GetCommandLineOptions(p, args));
+                    services.AddTransient<ManagerSettings>(GetManagerSettings);
+                    services.AddSingleton<HttpClient>(GetHttpClient);
+                    services.AddDDNSCore();
+                    services.AddSingleton<DDNSServiceFactory>();
+                    services.AddHostedService<Worker>();
+                    services.AddMemoryCache();
+                })
                 .ConfigureLogging((hostBuilderContext, logging) =>
                 {
                     logging.ClearProviders();
                     logging.AddConsole();
-                    logging.AddEventLog(s =>
-                    {
-                        s.LogName = "Application";
-                        s.SourceName = "DDNS Manager";
-                    });
+#if WINDOWS
+                        logging.AddEventLog(s =>
+                        {
+                            s.LogName = "Application";
+                            s.SourceName = "DDNS Manager";
+                        });
+#endif
                     logging.AddFileLogger(options =>
                     {
                         hostBuilderContext.Configuration.GetSection("Logging").GetSection("FileLogger").GetSection("Options").Bind(options);
                     });
 
                     logging.SetMinimumLevel(LogLevel.Debug);
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton<CommandLineOptions>(p => GetCommandLineOptions(p, args));
-                    services.AddTransient<ManagerSettings>(GetManagerSettings);
-                    services.AddSingleton<HttpClient>(GetHttpClient);
-                    services.AddSingleton<DDNSServiceFactory>();
-                    services.AddHostedService<Worker>();
-                    services.AddMemoryCache();
                 })
                 .Build();
             try

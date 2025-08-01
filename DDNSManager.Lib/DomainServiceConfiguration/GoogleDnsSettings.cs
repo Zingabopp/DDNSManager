@@ -1,9 +1,9 @@
 ﻿using DDNSManager.Lib.Configuration;
-using DDNSManager.Lib.Services;
+using DDNSManager.Lib.DomainServices;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace DDNSManager.Lib.ServiceConfiguration
+namespace DDNSManager.Lib.DomainServiceConfiguration
 {
     public class GoogleDnsSettings : IServiceSettings
     {
