@@ -1,11 +1,8 @@
 ﻿using DDNSManager.Lib.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,8 +23,8 @@ public class IIPCheckServiceTests
         HttpClient = new HttpClient();
         _services = new Dictionary<string, IIPCheckService>
         {
-            { IpifyKey, new IpifyIpCheckService(HttpClient, ConsoleLogger) },
-            { CloudflareKey, new CloudflareIpCheckService(HttpClient, ConsoleLogger) }
+            { IpifyKey, new IpifyIpCheckService(HttpClient, new ConsoleLogger<IpifyIpCheckService>()) },
+            { CloudflareKey, new CloudflareIpCheckService(HttpClient, new ConsoleLogger<CloudflareIpCheckService>()) }
         };
     }
 
@@ -37,10 +34,10 @@ public class IIPCheckServiceTests
     public async Task GetCurrentIpAsync_ReturnsIp(string serviceName)
     {
         // Arrange
-        var service = _services[serviceName];
+        IIPCheckService service = _services[serviceName];
 
         // Act
-        var result = await service.GetCurrentIPAsync(CancellationToken.None);
+        Lib.Result<string, Lib.ProblemDetails> result = await service.GetCurrentIPAsync(CancellationToken.None);
 
 
         // Assert
