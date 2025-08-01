@@ -16,7 +16,7 @@ namespace DDNSManager.Tests.Configuration
         public string? Hostname { get; set; }
         public string? IP { get; set; }
         public bool Enabled { get; set; }
-
+        public bool AllowCreate { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; }
         public string? FakeSetting1 { get; set; }
@@ -36,6 +36,7 @@ namespace DDNSManager.Tests.Configuration
                    Hostname == settings.Hostname &&
                    IP == settings.IP &&
                    Enabled == settings.Enabled &&
+                   AllowCreate == settings.AllowCreate &&
                    Username == settings.Username &&
                    Password == settings.Password &&
                    FakeSetting1 == settings.FakeSetting1 &&
