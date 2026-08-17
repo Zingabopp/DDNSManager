@@ -72,12 +72,17 @@ namespace DDNSManager.Service
                 lock (_locker)
                 {
                     Directory.CreateDirectory(DirectoryPath);
-                    string? logRecord = string.Format("{0} [{1}] {2} {3}", "[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "]", logLevel.ToString(), formatter(state, exception), exception != null ? exception.StackTrace : "");
+                    string? logRecord = string.Format("{0} [{1}] {2} {3}",
+                        "[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "]", logLevel.ToString(),
+                        formatter(state, exception), exception != null ? exception.StackTrace : "");
                     using StreamWriter? streamWriter = new StreamWriter(FilePath, true);
                     streamWriter.WriteLine(logRecord);
                 }
             }
-            catch { }
+            catch  (Exception ex)
+            {
+                Console.WriteLine($"Unhandled exception in FileLogger: \n{ex}");
+            }
         }
     }
 
