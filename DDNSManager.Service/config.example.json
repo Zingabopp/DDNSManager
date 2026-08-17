@@ -1,0 +1,39 @@
+{
+  "ApiToken": "{env.DDNS_MANAGER_API_TOKEN}", // The API token for the DDNS Manager service. This is used to authenticate API calls to the service.
+  "Interval": {
+    "Minutes": 0,
+    "Hours": 6,
+    "Days": 0
+  },
+  "Locations": [ // Each location assumed to have different public IP addresses
+    // API calls to update an IP will specify the location to update
+    "Location1",
+    "Location2"
+  ],
+  "Services": [
+    {
+      "Name": "CloudflareDns", // Must match IDDNSService.Id
+      "Enabled": true,
+      "Sites": [
+        {
+          "Domain": "example.com",
+          "Location": "Location1", // Must match a value from Locations, if provided. If null, the public IP of the machine running the service will be used.
+          "ZoneId": "{env.CLOUDFLARE_ZONE_ID_LOCATION1}", // Used in API url
+          "ApiToken": "{env.CLOUDFLARE_API_TOKEN}",
+          "ttl": 120, // If null, existing value is used
+          "AllowCreate": true, // If true, must check if record exists and create if it doesn't.
+          "Proxied": false
+        },
+        {
+          "Domain": "example2.com",
+          "Location": "Location2",
+          "ZoneId": "{env.CLOUDFLARE_ZONE_ID_LOCATION2}",
+          "ApiToken": "{env.CLOUDFLARE_API_TOKEN}",
+          "ttl": null,
+          "AllowCreate": true,
+          "Proxied": false
+        }
+      ]
+    }
+  ]
+}
